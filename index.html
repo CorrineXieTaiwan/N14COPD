@@ -12,7 +12,6 @@
             --main-blue: #0066cc;
             --bg-color: #f8f9fb;
             --base-font-size: 20px;
-            --point-orange: #ff9800;
         }
 
         body {
@@ -129,6 +128,7 @@
             color: #495057 !important;
             margin-top: 20px;
             transition: 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-prev-style.clicked {
@@ -136,19 +136,18 @@
             color: white !important;
         }
 
-        /* 歷史紀錄捲動容器 */
         .chart-scroll-wrapper {
             width: 100%;
-            overflow-x: auto; /* 啟用水平滑動 */
+            overflow-x: auto;
             margin-top: 10px;
             border-radius: 10px;
             background: #fff;
-            -webkit-overflow-scrolling: touch; /* iOS 滑動順暢 */
+            -webkit-overflow-scrolling: touch;
         }
 
         .chart-container {
             position: relative;
-            min-width: 100%; /* 至少填滿寬度 */
+            min-width: 100%;
             height: 350px;
         }
 
@@ -252,7 +251,7 @@
         let currentIdx = 0;
         let userScores = [];
         let chartInstance = null;
-        let showFullHistory = false; // 控制狀態：是否秀出全部
+        let showFullHistory = false;
 
         const vRef = ref(db, 'visitorCount');
         runTransaction(vRef, (curr) => (curr || 0) + 1);
@@ -329,16 +328,14 @@
             else if (total >= 10) { tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; box.innerHTML = "<strong>臨床影響：</strong>對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。"; }
             else { tag.innerText = "低影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>戒菸、打疫苗、追蹤。"; }
 
-            // 初次載入，預設秀出最近 10 次
             updateChart(id, 10);
 
-            // 按鈕切換邏輯
             document.getElementById('btnShowAll').onclick = function() {
                 showFullHistory = !showFullHistory;
                 if (showFullHistory) {
                     this.innerText = "顯示最近 10 次";
                     document.getElementById('chartTitle').innerText = "完整歷史紀錄";
-                    updateChart(id, 0); // 0 代表全部
+                    updateChart(id, 0);
                 } else {
                     this.innerText = "查看全部紀錄";
                     document.getElementById('chartTitle').innerText = "最近 10 次趨勢";
@@ -348,29 +345,15 @@
         }
 
         async function updateChart(id, limit) {
-            let historyQuery;
-            if (limit > 0) {
-                historyQuery = query(ref(db, `records/${id}`), limitToLast(limit));
-            } else {
-                historyQuery = query(ref(db, `records/${id}`));
-            }
+            let historyQuery = limit > 0 ? query(ref(db, `records/${id}`), limitToLast(limit)) : query(ref(db, `records/${id}`));
 
             onValue(historyQuery, (snap) => {
                 const labels = []; const data = [];
-                snap.forEach(child => { 
-                    labels.push(child.val().date); 
-                    data.push(child.val().score); 
-                });
+                snap.forEach(child => { labels.push(child.val().date); data.push(child.val().score); });
 
                 const totalPoints = data.length;
                 const chartBox = document.getElementById('chartBox');
-                
-                // 動態調整寬度：若超過 10 筆，每筆給予 60px 的空間，讓它可以滑動
-                if (totalPoints > 10) {
-                    chartBox.style.width = (totalPoints * 60) + "px";
-                } else {
-                    chartBox.style.width = "100%";
-                }
+                chartBox.style.width = totalPoints > 10 ? (totalPoints * 60) + "px" : "100%";
 
                 if (chartInstance) chartInstance.destroy();
                 const ctx = document.getElementById('historyChart').getContext('2d');
@@ -384,24 +367,19 @@
                             backgroundColor: 'rgba(0, 102, 204, 0.1)', 
                             fill: true, 
                             tension: 0.3, 
-                            pointRadius: 7,
-                            pointBackgroundColor: '#ffffff',
-                            pointBorderColor: '#ff9800',
-                            pointBorderWidth: 3
+                            pointRadius: 6,
+                            pointBackgroundColor: '#0066cc', // 回歸藍色點中心
+                            pointBorderColor: '#0066cc',     // 回歸藍色邊線
+                            pointBorderWidth: 1
                         }] 
                     },
                     options: { 
-                        maintainAspectRatio: false, // 必須設為 false 寬度才能被拉長
+                        maintainAspectRatio: false,
                         responsive: true, 
-                        scales: { 
-                            y: { min: 0, max: 40, ticks: { stepSize: 10 } },
-                            x: { ticks: { font: { size: 12 } } }
-                        }, 
+                        scales: { y: { min: 0, max: 40, ticks: { stepSize: 10 } } }, 
                         plugins: { legend: { display: false } } 
                     }
                 });
-                
-                // 自動滾動到最右邊（最新資料）
                 document.querySelector('.chart-scroll-wrapper').scrollLeft = chartBox.offsetWidth;
             });
         }
