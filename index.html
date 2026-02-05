@@ -12,6 +12,7 @@
             --main-blue: #0066cc;
             --bg-color: #f8f9fb;
             --base-font-size: 20px;
+            --point-orange: #ff9800; /* 定義橘色 */
         }
 
         body {
@@ -117,7 +118,6 @@
             color: white !important;
         }
 
-        /* 加大的返回按鈕樣式 */
         .btn-prev-style {
             width: 100% !important;
             height: 55px;
@@ -128,10 +128,14 @@
             background-color: #f8f9fa !important;
             color: #495057 !important;
             margin-top: 20px;
+            transition: 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-prev-style:active {
-            background-color: #e2e6ea !important;
+        /* 返回按鈕點擊後的動態感 */
+        .btn-prev-style.clicked {
+            background-color: #6c757d !important;
+            color: white !important;
         }
 
         .progress {
@@ -272,6 +276,7 @@
             document.getElementById('questionContainer').innerHTML = html;
             document.getElementById('pBar').style.width = `${((currentIdx + 1) / 8) * 100}%`;
 
+            // 評分按鈕點擊
             document.querySelectorAll('.btn-score').forEach(btn => {
                 btn.onclick = function() {
                     this.classList.add('clicked');
@@ -288,10 +293,15 @@
                 };
             });
 
+            // 返回按鈕點擊動態感
             if (!isFirst) {
-                document.getElementById('btnPrev').onclick = () => {
-                    currentIdx--;
-                    renderQuestion();
+                const prevBtn = document.getElementById('btnPrev');
+                prevBtn.onclick = function() {
+                    this.classList.add('clicked');
+                    setTimeout(() => {
+                        currentIdx--;
+                        renderQuestion();
+                    }, 150);
                 };
             }
         }
@@ -325,8 +335,27 @@
                 const ctx = document.getElementById('historyChart').getContext('2d');
                 chartInstance = new Chart(ctx, {
                     type: 'line',
-                    data: { labels: labels, datasets: [{ label: 'CAT 總分', data: data, borderColor: '#0066cc', backgroundColor: 'rgba(0, 102, 204, 0.1)', fill: true, tension: 0.3, pointRadius: 6 }] },
-                    options: { responsive: true, aspectRatio: 1.2, scales: { y: { min: 0, max: 40 } }, plugins: { legend: { display: false } } }
+                    data: { 
+                        labels: labels, 
+                        datasets: [{ 
+                            label: 'CAT 總分', 
+                            data: data, 
+                            borderColor: '#0066cc', 
+                            backgroundColor: 'rgba(0, 102, 204, 0.1)', 
+                            fill: true, 
+                            tension: 0.3, 
+                            pointRadius: 7,           // 圓點大小
+                            pointBackgroundColor: '#ffffff', // 圓點中心顏色
+                            pointBorderColor: '#ff9800',    // 橘色邊線
+                            pointBorderWidth: 3       // 邊線粗細
+                        }] 
+                    },
+                    options: { 
+                        responsive: true, 
+                        aspectRatio: 1.2, 
+                        scales: { y: { min: 0, max: 40 } }, 
+                        plugins: { legend: { display: false } } 
+                    }
                 });
             });
         }
