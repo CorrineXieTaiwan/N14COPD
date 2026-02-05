@@ -59,11 +59,6 @@
             border-radius: 15px;
         }
 
-        #patientID:focus {
-            border-color: var(--main-blue);
-            box-shadow: 0 0 10px rgba(0, 102, 204, 0.2);
-        }
-
         #btnStart {
             height: 70px !important;
             font-size: 26px !important;
@@ -75,7 +70,7 @@
             border: none;
             border-radius: 25px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            padding: 30px !important;
+            padding: 25px !important; /* 微調 Padding 避免過窄 */
         }
 
         .question-item {
@@ -87,12 +82,14 @@
             animation: fadeInRight 0.3s ease-out;
         }
 
+        /* 修正：確保 survey-box 寬度撐滿，內距適中 */
         .survey-box {
             border: 2px solid #e0e6ed;
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
             background-color: #ffffff;
             margin-top: 15px;
+            width: 100%;
         }
 
         .side-text {
@@ -103,22 +100,21 @@
             text-align: center;
         }
 
-        /* 核心按鈕優化：移除手機預設點擊色，改為自定義變色 */
+        /* 選項按鈕：確保 100% 寬度 */
         .btn-score {
-            width: 100%;
-            height: 60px;
+            width: 100% !important;
+            height: 65px; /* 稍微再加高一點點方便點擊 */
             margin: 6px 0 !important;
             border: 2px solid var(--main-blue) !important;
             background-color: #ffffff !important;
             color: var(--main-blue) !important;
-            font-size: 26px !important;
+            font-size: 28px !important;
             font-weight: 900;
             border-radius: 15px !important;
             transition: background-color 0.1s, color 0.1s;
-            -webkit-tap-highlight-color: transparent; /* 移除藍色方塊 */
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* 按下去的瞬間立即觸發顏色 */
         .btn-score:active, .btn-score.clicked {
             background-color: var(--main-blue) !important;
             color: white !important;
@@ -156,7 +152,7 @@
                 <input type="text" id="patientID" class="form-control text-center" placeholder="NO. 12345" inputmode="text">
                 <button class="btn btn-primary w-100" id="btnStart">開始評估 / 查詢趨勢</button>
             </div>
-            <p class="text-muted mt-3" style="font-size: 16px;">輸入後系統將自動為您記錄分數</p>
+            <p class="text-muted mt-3" style="font-size: 16px;">輸入後系統將自動記錄分數</p>
         </div>
 
         <div id="quizSection" style="display: none;">
@@ -238,7 +234,7 @@
                     <h5 class="text-center mb-2">第 ${currentIdx + 1} 題</h5>
                     <div class="survey-box">
                         <span class="side-text text-primary">${q.l}</span>
-                        <div class="btn-group-vertical" id="btnGroup">
+                        <div class="btn-group-vertical" id="btnGroup" style="width: 100%;">
                             ${[0, 1, 2, 3, 4, 5].map(v => `<button class="btn btn-score" data-val="${v}">${v}</button>`).join('')}
                         </div>
                         <span class="side-text text-danger">${q.r}</span>
@@ -258,11 +254,9 @@
 
             document.querySelectorAll('.btn-score').forEach(btn => {
                 btn.onclick = function() {
-                    // 1. 立即變色給予點擊回饋
                     this.classList.add('clicked');
                     userScores[currentIdx] = parseInt(this.dataset.val);
                     
-                    // 2. 稍微停頓 200ms 讓使用者看清楚選擇，再換題
                     setTimeout(() => {
                         if (currentIdx < questions.length - 1) {
                             currentIdx++;
@@ -301,7 +295,7 @@
             if (total > 30) { tag.innerText = "非常高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-danger"; box.innerHTML = "<strong>臨床影響：</strong>日常生活極大受限。<br><strong>建議：</strong>盡快諮詢醫師。"; }
             else if (total > 20) { tag.innerText = "高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-warning text-dark"; box.innerHTML = "<strong>臨床影響：</strong>大部分想做的事無法完成。<br><strong>建議：</strong>諮詢醫師調整藥物。"; }
             else if (total >= 10) { tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; box.innerHTML = "<strong>臨床影響：</strong>對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。"; }
-            else { tag.innerText = "低影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>戒菸、打疫苗、追蹤。"; }
+            else { tag.innerText = "低影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>請戒菸、打疫苗、追蹤。"; }
 
             const historyQuery = query(ref(db, `records/${id}`), limitToLast(10));
             onValue(historyQuery, (snap) => {
