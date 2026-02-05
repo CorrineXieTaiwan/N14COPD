@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>慢性阻塞肺病評估量表 CAT</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --main-blue: #0066cc;
+            --bg-color: #f8f9fb;
+            --base-font-size: 20px;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: "Microsoft JhengHei", sans-serif;
+            font-size: var(--base-font-size);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h4 {
+            font-size: 30px !important;
+            font-weight: 800 !important;
+            color: #333;
+        }
+
+        h5 {
+            font-size: 26px !important;
+            font-weight: bold;
+            color: var(--main-blue);
+        }
+
+        .visitor-counter {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 1050;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 16px;
+            backdrop-filter: blur(4px);
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            padding: 25px !important;
+        }
+
+        .question-item {
+            display: none;
+        }
+
+        .question-item.active {
+            display: block;
+            animation: fadeInRight 0.4s ease-out;
+        }
+
+        .form-control {
+            font-size: 22px !important;
+            padding: 15px !important;
+            border-radius: 12px;
+        }
+
+        .btn-primary {
+            font-size: 22px !important;
+            padding: 12px 25px !important;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        /* --- 核心調整：垂直問卷格式 --- */
+        .survey-box {
+            border: 2px solid #e0e6ed;
+            border-radius: 15px;
+            padding: 20px;
+            background-color: #ffffff;
+            margin-top: 15px;
+        }
+
+        .side-text {
+            font-size: 24px !important;
+            /* 這裡控制文字大小 */
+            font-weight: 900 !important;
+            /* 這裡設定最粗體 */
+            padding: 15px 0;
+            /* 稍微增加一點上下間距，視覺更舒服 */
+            display: block;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .btn-group-vertical {
+            width: 100%;
+        }
+
+        .btn-score {
+            width: 100%;
+            /* 寬度撐滿 */
+            height: 60px;
+            margin: 4px 0 !important;
+            border: 2px solid var(--main-blue) !important;
+            background: #fff;
+            color: var(--main-blue);
+            font-size: 26px !important;
+            font-weight: 900;
+            border-radius: 12px !important;
+            /* 方圓角設計更有整體感 */
+            transition: 0.2s;
+        }
+
+        .btn-score:active,
+        .btn-score:hover {
+            background: var(--main-blue) !important;
+            color: white !important;
+        }
+
+        /* --------------------------- */
+
+        .progress {
+            height: 12px;
+            border-radius: 10px;
+            background-color: #e9ecef;
+        }
+
+        .display-1 {
+            font-size: 6rem !important;
+            font-weight: 800;
+        }
+
+        .advice-text {
+            font-size: 20px !important;
+            color: #444;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="visitor-counter">瀏覽人次: <span id="vCount">0</span></div>
+
+    <div class="container py-4" style="max-width: 500px;">
+        <h4 class="text-center mb-4">慢性阻塞肺病評估量表 CAT</h4>
+
+        <div id="loginSection" class="card mb-4 text-center">
+            <label class="form-label fw-bold text-secondary mb-3">輸入病歷號(查找/記錄用)</label>
+            <div class="d-grid gap-3">
+                <input type="text" id="patientID" class="form-control text-center" placeholder="例如: No.12345">
+                <button class="btn btn-primary w-100" id="btnStart">開始評估 / 查詢</button>
+            </div>
+        </div>
+
+        <div id="quizSection" style="display: none;">
+            <div class="progress mb-4">
+                <div id="pBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+            </div>
+            <div id="questionContainer"></div>
+        </div>
+
+        <div id="resultSection" style="display: none;">
+            <div class="card text-center mb-4">
+                <h5 class="text-muted mb-1">本次評估總分</h5>
+                <div class="display-1 text-primary my-2" id="scoreDisplay">--</div>
+                <div id="levelTag" class="badge rounded-pill fs-5 py-3 px-4 mb-4"></div>
+                <div class="text-start bg-light p-4 rounded advice-text" id="adviceBox"></div>
+                <button class="btn btn-outline-secondary w-100 mt-4" onclick="location.reload()">重新檢測</button>
+            </div>
+
+            <div class="card shadow-sm">
+                <h5 class="fw-bold mb-3">變化趨勢 (最近10次)</h5>
+                <canvas id="historyChart"></canvas>
+                <p class="text-center text-muted mt-3" style="font-size: 16px;">※ 曲線上升代表症狀加重</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, runTransaction, get, query, limitToLast }
+            from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDw4h1MJjReMQ7WoRVrBhxR7eqwKypQTwA",
+            authDomain: "copdn14.firebaseapp.com",
+            projectId: "copdn14",
+            storageBucket: "copdn14.firebasestorage.app",
+            messagingSenderId: "374148356521",
+            appId: "1:374148356521:web:3ec298e5e069e864518cb8",
+            databaseURL: "https://copdn14-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const questions = [
+            { t: "咳嗽狀況", l: "我從不咳嗽", r: "我一直在咳嗽" },
+            { t: "胸腔痰液", l: "我一點痰都沒有", r: "我有非常多痰" },
+            { t: "胸悶感覺", l: "一點也沒有胸悶", r: "胸悶感覺很嚴重" },
+            { t: "爬坡/爬樓梯", l: "不感覺喘不過氣", r: "感覺非常喘不過氣" },
+            { t: "居家活動", l: "不受限制", r: "受到很大限制" },
+            { t: "信心狀況", l: "有信心外出", r: "完全沒信心外出" },
+            { t: "睡眠品質", l: "睡得安穩", r: "睡得不安穩" },
+            { t: "活力狀況", l: "活力旺盛", r: "一點活力都沒有" }
+        ];
+
+        let currentIdx = 0;
+        let userScores = [];
+        let chartInstance = null;
+
+        const vRef = ref(db, 'visitorCount');
+        runTransaction(vRef, (curr) => (curr || 0) + 1);
+        onValue(vRef, (snap) => document.getElementById('vCount').innerText = snap.val());
+
+        document.getElementById('btnStart').onclick = async () => {
+            const id = document.getElementById('patientID').value.trim();
+            if (!id) return alert("請輸入病歷號碼");
+            const userRef = ref(db, `records/${id}`);
+            const snap = await get(userRef);
+            if (!snap.exists()) alert("✨ 帳號開通成功！已建立新檔案。");
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('quizSection').style.display = 'block';
+            renderQuestion();
+        };
+
+        // --- 修改後的渲染函數 (垂直結構) ---
+        function renderQuestion() {
+            const q = questions[currentIdx];
+            const html = `
+            <div class="question-item active">
+                <div class="card">
+                    <h5 class="text-center mb-2">第 ${currentIdx + 1} 題</h5>
+                    <div class="survey-box">
+                        <span class="side-text text-primary">${q.l}</span>
+                        <div class="btn-group-vertical">
+                            ${[0, 1, 2, 3, 4, 5].map(v => `<button class="btn btn-score" data-val="${v}">${v}</button>`).join('')}
+                        </div>
+                        <span class="side-text text-danger">${q.r}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+            document.getElementById('questionContainer').innerHTML = html;
+            document.getElementById('pBar').style.width = `${((currentIdx + 1) / 8) * 100}%`;
+
+            document.querySelectorAll('.btn-score').forEach(btn => {
+                btn.onclick = () => {
+                    userScores.push(parseInt(btn.dataset.val));
+                    if (currentIdx < questions.length - 1) {
+                        currentIdx++;
+                        renderQuestion();
+                    } else {
+                        finishQuiz();
+                    }
+                };
+            });
+        }
+
+        async function finishQuiz() {
+            const id = document.getElementById('patientID').value.trim();
+            const total = userScores.reduce((a, b) => a + b, 0);
+            const now = new Date();
+            const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+            await push(ref(db, `records/${id}`), { score: total, date: timeStr, timestamp: Date.now() });
+            showResults(total, id);
+        }
+
+        async function showResults(total, id) {
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('scoreDisplay').innerText = total;
+            const box = document.getElementById('adviceBox');
+            const tag = document.getElementById('levelTag');
+            if (total > 30) { tag.innerText = "非常高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-danger"; box.innerHTML = "<strong>臨床影響：</strong>日常生活極大受限。<br><strong>建議：</strong>盡快諮詢醫師。"; }
+            else if (total > 20) { tag.innerText = "高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-warning text-dark"; box.innerHTML = "<strong>臨床影響：</strong>大部分想做的事無法完成。<br><strong>建議：</strong>諮詢醫師調整藥物。"; }
+            else if (total >= 10) { tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; box.innerHTML = "<strong>臨床影響：</strong>對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。"; }
+            else { tag.innerText = "低影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>戒菸、打疫苗、追蹤。"; }
+
+            const historyQuery = query(ref(db, `records/${id}`), limitToLast(10));
+            onValue(historyQuery, (snap) => {
+                const labels = []; const data = [];
+                snap.forEach(child => { labels.push(child.val().date); data.push(child.val().score); });
+                if (chartInstance) chartInstance.destroy();
+                const ctx = document.getElementById('historyChart').getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: labels, datasets: [{ label: 'CAT 總分', data: data, borderColor: '#0066cc', backgroundColor: 'rgba(0, 102, 204, 0.1)', fill: true, tension: 0.3, pointRadius: 6 }] },
+                    options: { responsive: true, aspectRatio: 1.2, scales: { y: { min: 0, max: 40 } }, plugins: { legend: { display: false } } }
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>
