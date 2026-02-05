@@ -180,7 +180,7 @@
         <div id="loginSection" class="card mb-4 text-center">
             <h5 class="mb-4 text-secondary">請輸入病歷號碼</h5>
             <div class="d-grid gap-4">
-                <input type="text" id="patientID" class="form-control text-center" placeholder="初次登入請輸入病歷號碼創建資料" inputmode="text">
+                <input type="text" id="patientID" class="form-control text-center" placeholder="NO. 12345" inputmode="text">
                 <button class="btn btn-primary w-100" id="btnStart">開始評估 / 查詢趨勢</button>
             </div>
             <p class="text-muted mt-3" style="font-size: 16px;">輸入後系統將自動記錄分數</p>
@@ -213,7 +213,8 @@
                         <canvas id="historyChart"></canvas>
                     </div>
                 </div>
-                <p class="text-center text-muted mt-3" style="font-size: 14px;">※ 查看全部記錄向左滑動可查看數據變化</p>
+                <p id="scrollHint" class="text-center text-muted mt-3" style="font-size: 14px; display: none;">※ 向左滑動可查看歷史變化</p>
+                <p class="text-center text-muted mt-1" style="font-size: 14px;">※ 曲線上升代表症狀加重</p>
             </div>
         </div>
     </div>
@@ -332,13 +333,16 @@
 
             document.getElementById('btnShowAll').onclick = function() {
                 showFullHistory = !showFullHistory;
+                const hint = document.getElementById('scrollHint');
                 if (showFullHistory) {
                     this.innerText = "顯示最近 10 次";
                     document.getElementById('chartTitle').innerText = "完整歷史紀錄";
+                    hint.style.display = 'block'; // 顯示滑動提示
                     updateChart(id, 0);
                 } else {
                     this.innerText = "查看全部紀錄";
                     document.getElementById('chartTitle').innerText = "最近 10 次趨勢";
+                    hint.style.display = 'none'; // 隱藏滑動提示
                     updateChart(id, 10);
                 }
             };
@@ -353,7 +357,7 @@
 
                 const totalPoints = data.length;
                 const chartBox = document.getElementById('chartBox');
-                chartBox.style.width = totalPoints > 10 ? (totalPoints * 60) + "px" : "100%";
+                chartBox.style.width = (totalPoints > 10 && showFullHistory) ? (totalPoints * 60) + "px" : "100%";
 
                 if (chartInstance) chartInstance.destroy();
                 const ctx = document.getElementById('historyChart').getContext('2d');
@@ -368,8 +372,8 @@
                             fill: true, 
                             tension: 0.3, 
                             pointRadius: 6,
-                            pointBackgroundColor: '#0066cc', // 回歸藍色點中心
-                            pointBorderColor: '#0066cc',     // 回歸藍色邊線
+                            pointBackgroundColor: '#0066cc',
+                            pointBorderColor: '#0066cc',
                             pointBorderWidth: 1
                         }] 
                     },
@@ -380,11 +384,16 @@
                         plugins: { legend: { display: false } } 
                     }
                 });
-                document.querySelector('.chart-scroll-wrapper').scrollLeft = chartBox.offsetWidth;
+                
+                // 如果是查看全部且資料多，自動滾動到最右邊
+                if (showFullHistory) {
+                    setTimeout(() => {
+                        document.querySelector('.chart-scroll-wrapper').scrollLeft = chartBox.offsetWidth;
+                    }, 100);
+                }
             });
         }
     </script>
 </body>
 
 </html>
-
