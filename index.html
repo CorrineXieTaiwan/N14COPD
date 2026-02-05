@@ -213,8 +213,11 @@
                         <canvas id="historyChart"></canvas>
                     </div>
                 </div>
-                <p id="scrollHint" class="text-center text-muted mt-3" style="font-size: 14px; display: none;">※ 向左滑動可查看歷史變化</p>
-                <p class="text-center text-muted mt-1" style="font-size: 14px;">※ 曲線上升代表症狀加重</p>
+                
+                <div class="text-center mt-3">
+                    <p id="scrollHint" class="text-muted mb-0" style="font-size: 14px; display: none;">※ 向左滑動可查看歷史變化</p>
+                    <p id="upHint" class="text-muted mb-0" style="font-size: 14px;">※ 曲線上升代表症狀加重</p>
+                </div>
             </div>
         </div>
     </div>
@@ -282,7 +285,7 @@
                         <span class="side-text text-danger">${q.r}</span>
                     </div>
                     <div class="text-center" style="display: ${isFirst ? 'none' : 'block'}">
-                        <button id="btnPrev" class="btn btn-prev-style">← 返回上一題</button>
+                        <button id="btnPrev" class="btn btn-prev-style">返回上一題</button>
                     </div>
                 </div>
             `;
@@ -324,25 +327,29 @@
             
             const tag = document.getElementById('levelTag');
             const box = document.getElementById('adviceBox');
-            if (total > 30) { tag.innerText = "非常高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-danger"; box.innerHTML = "<strong>臨床影響：</strong>日常生活極大受限。<br><strong>建議：</strong>盡快諮詢醫師。"; }
-            else if (total > 20) { tag.innerText = "高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-warning text-dark"; box.innerHTML = "<strong>臨床影響：</strong>大部分想做的事無法完成。<br><strong>建議：</strong>諮詢醫師調整藥物。"; }
-            else if (total >= 10) { tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; box.innerHTML = "<strong>臨床影響：</strong>對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。"; }
-            else { tag.innerText = "低影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>戒菸、打疫苗、追蹤。"; }
+            if (total > 30) { tag.innerText = "非常高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-danger"; box.innerHTML = "<strong>臨床影響：</strong>日常生活極大受限。<br><strong>建議：</strong>請盡快就診諮詢醫師！"; }
+            else if (total > 20) { tag.innerText = "高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-warning text-dark"; box.innerHTML = "<strong>臨床影響：</strong>大部分想做的事情無法完成。<br><strong>建議：</strong>諮詢醫師調整藥物。"; }
+            else if (total >= 10) { tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; box.innerHTML = "<strong>臨床影響：</strong>已對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。"; }
+            else { tag.innerText = "輕微影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>請戒菸、打疫苗、追蹤。"; }
 
             updateChart(id, 10);
 
             document.getElementById('btnShowAll').onclick = function() {
                 showFullHistory = !showFullHistory;
-                const hint = document.getElementById('scrollHint');
+                const scrollHint = document.getElementById('scrollHint');
+                const upHint = document.getElementById('upHint');
+                
                 if (showFullHistory) {
                     this.innerText = "顯示最近 10 次";
                     document.getElementById('chartTitle').innerText = "完整歷史紀錄";
-                    hint.style.display = 'block'; // 顯示滑動提示
+                    scrollHint.style.display = 'block'; // 模式A：顯示滑動，隱藏上升
+                    upHint.style.display = 'none';
                     updateChart(id, 0);
                 } else {
                     this.innerText = "查看全部紀錄";
                     document.getElementById('chartTitle').innerText = "最近 10 次趨勢";
-                    hint.style.display = 'none'; // 隱藏滑動提示
+                    scrollHint.style.display = 'none'; // 模式B：隱藏滑動，顯示上升
+                    upHint.style.display = 'block';
                     updateChart(id, 10);
                 }
             };
@@ -385,7 +392,6 @@
                     }
                 });
                 
-                // 如果是查看全部且資料多，自動滾動到最右邊
                 if (showFullHistory) {
                     setTimeout(() => {
                         document.querySelector('.chart-scroll-wrapper').scrollLeft = chartBox.offsetWidth;
