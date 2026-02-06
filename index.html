@@ -10,6 +10,8 @@
     <style>
         :root {
             --main-blue: #0066cc;
+            --main-green: #28a745;
+            /* 新增綠色變數 */
             --bg-color: #f8f9fb;
             --base-font-size: 20px;
         }
@@ -57,6 +59,7 @@
             padding: 25px !important;
         }
 
+        /* 輸入框樣式優化 */
         #patientID {
             height: 70px !important;
             font-size: 28px !important;
@@ -64,29 +67,14 @@
             border: 3px solid #ddd;
             border-radius: 15px;
             color: #444;
-            /* 輸入後的文字顏色稍微調淺一點 */
         }
 
-        /* 新增：將提示文字顏色淡化 */
         #patientID::placeholder {
             color: #cccccc;
-            /* 極淡灰色 */
             opacity: 0.8;
         }
 
-        /* 針對不同瀏覽器的提示文字相容性 */
-        #patientID::-webkit-input-placeholder {
-            color: #cccccc;
-        }
-
-        #patientID::-moz-placeholder {
-            color: #cccccc;
-        }
-
-        #patientID:-ms-input-placeholder {
-            color: #cccccc;
-        }
-
+        /* 通用導覽按鈕 */
         .btn-main-nav {
             height: 100px !important;
             font-size: 28px !important;
@@ -97,18 +85,32 @@
             align-items: center;
             justify-content: center;
             transition: 0.2s;
+            border: none !important;
+            color: white !important;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-main-nav.clicked,
-        .btn-score.clicked,
-        .btn-prev-style.clicked,
-        .btn-outline-secondary.clicked {
+        /* 藍色按鈕 (今日評估) */
+        .btn-blue {
             background-color: var(--main-blue) !important;
-            color: white !important;
-            transform: scale(0.98);
         }
 
+        .btn-blue.clicked {
+            background-color: #004d99 !important;
+            transform: scale(0.96);
+        }
+
+        /* 綠色按鈕 (趨勢紀錄) */
+        .btn-green {
+            background-color: var(--main-green) !important;
+        }
+
+        .btn-green.clicked {
+            background-color: #1e7e34 !important;
+            transform: scale(0.96);
+        }
+
+        /* 問卷評分按鈕樣式 */
         .btn-score {
             width: 100% !important;
             height: 65px;
@@ -119,6 +121,11 @@
             font-size: 28px !important;
             font-weight: 900;
             border-radius: 15px !important;
+        }
+
+        .btn-score.clicked {
+            background-color: var(--main-blue) !important;
+            color: white !important;
         }
 
         .btn-prev-style {
@@ -203,15 +210,15 @@
             <div class="d-grid gap-4">
                 <input type="text" id="patientID" class="form-control text-center" placeholder="NO. 12345"
                     inputmode="numeric">
-                <button class="btn btn-primary btn-main-nav" id="btnStart">登入 / 建立檔案</button>
+                <button class="btn btn-primary btn-main-nav btn-blue" id="btnStart">登入 / 建立檔案</button>
             </div>
         </div>
 
         <div id="navSection" class="card text-center section-fade" style="display: none;">
             <h5 class="mb-4 text-secondary">請選擇功能</h5>
             <div class="d-grid">
-                <button class="btn btn-primary btn-main-nav" id="navQuiz">開始今日評估</button>
-                <button class="btn btn-outline-primary btn-main-nav" id="navChart">查看趨勢紀錄</button>
+                <button class="btn btn-main-nav btn-blue" id="navQuiz">開始今日評估</button>
+                <button class="btn btn-main-nav btn-green" id="navChart">查看趨勢紀錄</button>
                 <button class="btn-switch-id" onclick="location.reload()">切換其他病歷號</button>
             </div>
         </div>
@@ -274,12 +281,12 @@
         const questions = [
             { t: "咳嗽狀況", l: "我從不咳嗽", r: "我一直在咳嗽" },
             { t: "胸腔痰液", l: "我一點痰都沒有", r: "我有非常多痰" },
-            { t: "胸悶感覺", l: "我一點也沒有胸悶", r: "我胸悶感覺很嚴重" },
-            { t: "爬坡/爬樓梯", l: "我不感覺喘不過氣", r: "我感覺非常喘不過氣" },
-            { t: "居家活動", l: "我不受限制", r: "我受到很大限制" },
-            { t: "信心狀況", l: "我有信心外出", r: "我完全沒信心外出" },
-            { t: "睡眠品質", l: "我睡得安穩", r: "我睡得不安穩" },
-            { t: "活力狀況", l: "我活力旺盛", r: "我一點活力都沒有" }
+            { t: "胸悶感覺", l: "一點也沒有胸悶", r: "胸悶感覺很嚴重" },
+            { t: "爬坡/爬樓梯", l: "不感覺喘不過氣", r: "感覺非常喘不過氣" },
+            { t: "居家活動", l: "不受限制", r: "受到很大限制" },
+            { t: "信心狀況", l: "有信心外出", r: "完全沒信心外出" },
+            { t: "睡眠品質", l: "睡得安穩", r: "睡得不安穩" },
+            { t: "活力狀況", l: "活力旺盛", r: "一點活力都沒有" }
         ];
 
         let currentIdx = 0;
@@ -292,7 +299,7 @@
         onValue(vRef, (snap) => document.getElementById('vCount').innerText = snap.val());
 
         function resetBtnStyles() {
-            document.querySelectorAll('.btn-main-nav, .btn-score, .btn-prev-style, .btn-outline-secondary').forEach(btn => {
+            document.querySelectorAll('.btn-main-nav, .btn-score').forEach(btn => {
                 btn.classList.remove('clicked');
             });
         }
@@ -300,11 +307,9 @@
         document.getElementById('btnStart').onclick = async function () {
             const id = document.getElementById('patientID').value.trim();
             if (!id) return alert("請輸入病歷號碼");
-
             this.classList.add('clicked');
             const snap = await get(ref(db, `records/${id}`));
             if (!snap.exists()) alert("✨ 帳號開通成功！已建立新檔案。");
-
             setTimeout(() => {
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('navSection').style.display = 'block';
@@ -388,7 +393,6 @@
             const now = new Date();
             const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
             await push(ref(db, `records/${id}`), { score: total, date: timeStr, timestamp: Date.now() });
-
             document.getElementById('quizSection').style.display = 'none';
             document.getElementById('resultSection').style.display = 'block';
             document.getElementById('summaryBox').style.display = 'block';
