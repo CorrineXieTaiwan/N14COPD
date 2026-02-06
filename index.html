@@ -63,6 +63,28 @@
             font-weight: bold;
             border: 3px solid #ddd;
             border-radius: 15px;
+            color: #444;
+            /* 輸入後的文字顏色稍微調淺一點 */
+        }
+
+        /* 新增：將提示文字顏色淡化 */
+        #patientID::placeholder {
+            color: #cccccc;
+            /* 極淡灰色 */
+            opacity: 0.8;
+        }
+
+        /* 針對不同瀏覽器的提示文字相容性 */
+        #patientID::-webkit-input-placeholder {
+            color: #cccccc;
+        }
+
+        #patientID::-moz-placeholder {
+            color: #cccccc;
+        }
+
+        #patientID:-ms-input-placeholder {
+            color: #cccccc;
         }
 
         .btn-main-nav {
@@ -78,8 +100,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 核心按鈕動態與點擊回饋 */
-        /* 這裡我們確保只有帶有 .clicked 的時候才變色 */
         .btn-main-nav.clicked,
         .btn-score.clicked,
         .btn-prev-style.clicked,
@@ -182,7 +202,7 @@
             <h5 class="mb-4 text-secondary">請輸入病歷號碼</h5>
             <div class="d-grid gap-4">
                 <input type="text" id="patientID" class="form-control text-center" placeholder="NO. 12345"
-                    inputmode="text">
+                    inputmode="numeric">
                 <button class="btn btn-primary btn-main-nav" id="btnStart">登入 / 建立檔案</button>
             </div>
         </div>
@@ -254,12 +274,12 @@
         const questions = [
             { t: "咳嗽狀況", l: "我從不咳嗽", r: "我一直在咳嗽" },
             { t: "胸腔痰液", l: "我一點痰都沒有", r: "我有非常多痰" },
-            { t: "胸悶感覺", l: "一點也沒有胸悶", r: "胸悶感覺很嚴重" },
-            { t: "爬坡/爬樓梯", l: "不感覺喘不過氣", r: "感覺非常喘不過氣" },
-            { t: "居家活動", l: "不受限制", r: "受到很大限制" },
-            { t: "信心狀況", l: "有信心外出", r: "完全沒信心外出" },
-            { t: "睡眠品質", l: "睡得安穩", r: "睡得不安穩" },
-            { t: "活力狀況", l: "活力旺盛", r: "一點活力都沒有" }
+            { t: "胸悶感覺", l: "我一點也沒有胸悶", r: "我胸悶感覺很嚴重" },
+            { t: "爬坡/爬樓梯", l: "我不感覺喘不過氣", r: "我感覺非常喘不過氣" },
+            { t: "居家活動", l: "我不受限制", r: "我受到很大限制" },
+            { t: "信心狀況", l: "我有信心外出", r: "我完全沒信心外出" },
+            { t: "睡眠品質", l: "我睡得安穩", r: "我睡得不安穩" },
+            { t: "活力狀況", l: "我活力旺盛", r: "我一點活力都沒有" }
         ];
 
         let currentIdx = 0;
@@ -271,7 +291,6 @@
         runTransaction(vRef, (curr) => (curr || 0) + 1);
         onValue(vRef, (snap) => document.getElementById('vCount').innerText = snap.val());
 
-        // 輔助函數：清除所有按鈕的 clicked 樣式
         function resetBtnStyles() {
             document.querySelectorAll('.btn-main-nav, .btn-score, .btn-prev-style, .btn-outline-secondary').forEach(btn => {
                 btn.classList.remove('clicked');
@@ -289,7 +308,7 @@
             setTimeout(() => {
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('navSection').style.display = 'block';
-                resetBtnStyles(); // 清除點擊樣式
+                resetBtnStyles();
             }, 150);
         };
 
@@ -301,7 +320,7 @@
                 document.getElementById('navSection').style.display = 'none';
                 document.getElementById('quizSection').style.display = 'block';
                 renderQuestion();
-                resetBtnStyles(); // 清除點擊樣式
+                resetBtnStyles();
             }, 150);
         };
 
@@ -313,7 +332,7 @@
                 document.getElementById('resultSection').style.display = 'block';
                 document.getElementById('summaryBox').style.display = 'none';
                 updateChart(id, 5);
-                resetBtnStyles(); // 清除點擊樣式
+                resetBtnStyles();
             }, 150);
         };
 
@@ -424,7 +443,7 @@
             setTimeout(() => {
                 document.getElementById('resultSection').style.display = 'none';
                 document.getElementById('navSection').style.display = 'block';
-                resetBtnStyles(); // 返回選單後重置所有按鈕樣式
+                resetBtnStyles();
             }, 150);
         };
 
