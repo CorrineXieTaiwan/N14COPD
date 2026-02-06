@@ -50,6 +50,13 @@
             color: var(--main-blue);
         }
 
+        .card {
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 25px !important;
+        }
+
         #patientID {
             height: 70px !important;
             font-size: 28px !important;
@@ -58,44 +65,28 @@
             border-radius: 15px;
         }
 
-        #btnStart {
-            height: 70px !important;
-            font-size: 26px !important;
+        .btn-main-nav {
+            height: 100px !important;
+            font-size: 28px !important;
             font-weight: 800 !important;
-            border-radius: 15px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            padding: 25px !important;
-        }
-
-        .question-item {
-            display: none;
-        }
-
-        .question-item.active {
-            display: block;
-            animation: fadeInRight 0.3s ease-out;
-        }
-
-        .survey-box {
-            border: 2px solid #e0e6ed;
             border-radius: 20px;
-            padding: 15px;
-            background-color: #ffffff;
-            margin-top: 15px;
-            width: 100%;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .side-text {
-            font-size: 22px !important;
-            font-weight: 900 !important;
-            padding: 12px 0;
-            display: block;
-            text-align: center;
+        /* 核心按鈕動態與點擊回饋 */
+        /* 這裡我們確保只有帶有 .clicked 的時候才變色 */
+        .btn-main-nav.clicked,
+        .btn-score.clicked,
+        .btn-prev-style.clicked,
+        .btn-outline-secondary.clicked {
+            background-color: var(--main-blue) !important;
+            color: white !important;
+            transform: scale(0.98);
         }
 
         .btn-score {
@@ -108,13 +99,6 @@
             font-size: 28px !important;
             font-weight: 900;
             border-radius: 15px !important;
-            transition: background-color 0.1s, color 0.1s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn-score:active, .btn-score.clicked {
-            background-color: var(--main-blue) !important;
-            color: white !important;
         }
 
         .btn-prev-style {
@@ -127,19 +111,20 @@
             background-color: #f8f9fa !important;
             color: #495057 !important;
             margin-top: 20px;
-            transition: 0.1s;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-prev-style.clicked {
-            background-color: #6c757d !important;
-            color: white !important;
-        }
-
-        /* 重新檢測按鈕的點擊回饋 */
-        .btn-outline-secondary.clicked {
-            background-color: #6c757d !important;
-            color: white !important;
+        .btn-switch-id {
+            border: none;
+            background: #e9ecef;
+            color: #6c757d;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            width: 100%;
+            transition: 0.2s;
+            text-decoration: none !important;
         }
 
         .chart-scroll-wrapper {
@@ -157,19 +142,29 @@
             height: 350px;
         }
 
-        .progress {
-            height: 14px;
-            border-radius: 10px;
-        }
-
-        .display-1 {
-            font-size: 6rem !important;
-            font-weight: 800;
+        .side-text {
+            font-size: 28px !important;
+            font-weight: 900 !important;
+            padding: 15px 0;
+            display: block;
+            text-align: center;
+            line-height: 1.3;
         }
 
         @keyframes fadeInRight {
-            from { opacity: 0; transform: translateX(20px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .section-fade {
+            animation: fadeInRight 0.3s ease-out;
         }
     </style>
 </head>
@@ -181,49 +176,58 @@
     </div>
 
     <div class="container py-2" style="max-width: 500px;">
-        <h4 class="text-center">慢性阻塞肺病評估 (CAT)</h4>
+        <h4 class="text-center">慢性阻塞性肺疾病評估 (CAT)</h4>
 
-        <div id="loginSection" class="card mb-4 text-center">
+        <div id="loginSection" class="card text-center section-fade">
             <h5 class="mb-4 text-secondary">請輸入病歷號碼</h5>
             <div class="d-grid gap-4">
-                <input type="text" id="patientID" class="form-control text-center" placeholder="NO. 12345" inputmode="text">
-                <button class="btn btn-primary w-100" id="btnStart">開始評估 / 查詢趨勢</button>
+                <input type="text" id="patientID" class="form-control text-center" placeholder="NO. 12345"
+                    inputmode="text">
+                <button class="btn btn-primary btn-main-nav" id="btnStart">登入 / 建立檔案</button>
             </div>
-            <p class="text-muted mt-3" style="font-size: 16px;">輸入後系統將自動記錄分數</p>
         </div>
 
-        <div id="quizSection" style="display: none;">
-            <div class="progress mb-4">
+        <div id="navSection" class="card text-center section-fade" style="display: none;">
+            <h5 class="mb-4 text-secondary">請選擇功能</h5>
+            <div class="d-grid">
+                <button class="btn btn-primary btn-main-nav" id="navQuiz">開始今日評估</button>
+                <button class="btn btn-outline-primary btn-main-nav" id="navChart">查看趨勢紀錄</button>
+                <button class="btn-switch-id" onclick="location.reload()">切換其他病歷號</button>
+            </div>
+        </div>
+
+        <div id="quizSection" class="section-fade" style="display: none;">
+            <div class="progress mb-4" style="height: 14px; border-radius: 10px;">
                 <div id="pBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
             </div>
             <div id="questionContainer"></div>
         </div>
 
-        <div id="resultSection" style="display: none;">
-            <div class="card text-center mb-4">
+        <div id="resultSection" class="section-fade" style="display: none;">
+            <div id="summaryBox" class="card text-center mb-4">
                 <h5 class="text-muted mb-1">評估總分</h5>
-                <div class="display-1 text-primary my-2" id="scoreDisplay">--</div>
+                <div class="display-1 my-2" id="scoreDisplay" style="font-size: 6rem; font-weight: 800;">--</div>
                 <div id="levelTag" class="badge rounded-pill fs-5 py-3 px-4 mb-4"></div>
                 <div class="text-start bg-light p-4 rounded" id="adviceBox" style="font-size: 18px;"></div>
-                <button id="btnReload" class="btn btn-outline-secondary w-100 mt-4">重新檢測</button>
             </div>
 
             <div class="card shadow-sm">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="fw-bold m-0" id="chartTitle">最近 10 次趨勢</h5>
-                    <button id="btnShowAll" class="btn btn-sm btn-outline-primary fw-bold" style="border-radius: 8px;">查看全部紀錄</button>
+                    <h5 class="fw-bold m-0" id="chartTitle">最近 5 次趨勢</h5>
+                    <button id="btnShowAll" class="btn btn-sm btn-outline-primary fw-bold"
+                        style="border-radius: 8px;">查看全部紀錄</button>
                 </div>
-                
                 <div class="chart-scroll-wrapper">
                     <div class="chart-container" id="chartBox">
                         <canvas id="historyChart"></canvas>
                     </div>
                 </div>
-                
                 <div class="text-center mt-3">
-                    <p id="scrollHint" class="text-muted mb-0" style="font-size: 14px; display: none;">※ 向左滑動可查看歷史變化</p>
+                    <p id="scrollHint" class="text-muted mb-0" style="font-size: 14px; display: none;">※ 左右滑動可查看歷史變化</p>
                     <p id="upHint" class="text-muted mb-0" style="font-size: 14px;">※ 曲線上升代表症狀加重</p>
                 </div>
+                <button id="btnReload" class="btn btn-outline-secondary w-100 mt-4"
+                    style="height: 60px; font-size: 22px; font-weight: bold; border-radius: 15px;">返回功能選單</button>
             </div>
         </div>
     </div>
@@ -267,31 +271,72 @@
         runTransaction(vRef, (curr) => (curr || 0) + 1);
         onValue(vRef, (snap) => document.getElementById('vCount').innerText = snap.val());
 
-        document.getElementById('btnStart').onclick = async () => {
+        // 輔助函數：清除所有按鈕的 clicked 樣式
+        function resetBtnStyles() {
+            document.querySelectorAll('.btn-main-nav, .btn-score, .btn-prev-style, .btn-outline-secondary').forEach(btn => {
+                btn.classList.remove('clicked');
+            });
+        }
+
+        document.getElementById('btnStart').onclick = async function () {
             const id = document.getElementById('patientID').value.trim();
             if (!id) return alert("請輸入病歷號碼");
+
+            this.classList.add('clicked');
             const snap = await get(ref(db, `records/${id}`));
             if (!snap.exists()) alert("✨ 帳號開通成功！已建立新檔案。");
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('quizSection').style.display = 'block';
-            renderQuestion();
+
+            setTimeout(() => {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('navSection').style.display = 'block';
+                resetBtnStyles(); // 清除點擊樣式
+            }, 150);
+        };
+
+        document.getElementById('navQuiz').onclick = function () {
+            this.classList.add('clicked');
+            currentIdx = 0;
+            userScores = [];
+            setTimeout(() => {
+                document.getElementById('navSection').style.display = 'none';
+                document.getElementById('quizSection').style.display = 'block';
+                renderQuestion();
+                resetBtnStyles(); // 清除點擊樣式
+            }, 150);
+        };
+
+        document.getElementById('navChart').onclick = function () {
+            const id = document.getElementById('patientID').value.trim();
+            this.classList.add('clicked');
+            setTimeout(() => {
+                document.getElementById('navSection').style.display = 'none';
+                document.getElementById('resultSection').style.display = 'block';
+                document.getElementById('summaryBox').style.display = 'none';
+                updateChart(id, 5);
+                resetBtnStyles(); // 清除點擊樣式
+            }, 150);
         };
 
         function renderQuestion() {
             const q = questions[currentIdx];
             const isFirst = currentIdx === 0;
+            const savedScore = userScores[currentIdx];
+
             const html = `
                 <div class="card">
                     <h5 class="text-center mb-2">第 ${currentIdx + 1} 題</h5>
                     <div class="survey-box">
                         <span class="side-text text-primary">${q.l}</span>
                         <div class="btn-group-vertical" style="width: 100%;">
-                            ${[0, 1, 2, 3, 4, 5].map(v => `<button class="btn btn-score" data-val="${v}">${v}</button>`).join('')}
+                            ${[0, 1, 2, 3, 4, 5].map(v => {
+                const isSelected = (savedScore === v) ? 'clicked' : '';
+                return `<button class="btn btn-score ${isSelected}" data-val="${v}">${v}</button>`;
+            }).join('')}
                         </div>
                         <span class="side-text text-danger">${q.r}</span>
                     </div>
                     <div class="text-center" style="display: ${isFirst ? 'none' : 'block'}">
-                        <button id="btnPrev" class="btn btn-prev-style">← 返回上一題</button>
+                        <button id="btnPrev" class="btn btn-prev-style">返回上一題</button>
                     </div>
                 </div>
             `;
@@ -299,7 +344,8 @@
             document.getElementById('pBar').style.width = `${((currentIdx + 1) / 8) * 100}%`;
 
             document.querySelectorAll('.btn-score').forEach(btn => {
-                btn.onclick = function() {
+                btn.onclick = function () {
+                    document.querySelectorAll('.btn-score').forEach(b => b.classList.remove('clicked'));
                     this.classList.add('clicked');
                     userScores[currentIdx] = parseInt(this.dataset.val);
                     setTimeout(() => {
@@ -310,7 +356,7 @@
             });
 
             if (!isFirst) {
-                document.getElementById('btnPrev').onclick = function() {
+                document.getElementById('btnPrev').onclick = function () {
                     this.classList.add('clicked');
                     setTimeout(() => { currentIdx--; renderQuestion(); }, 150);
                 };
@@ -323,96 +369,82 @@
             const now = new Date();
             const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
             await push(ref(db, `records/${id}`), { score: total, date: timeStr, timestamp: Date.now() });
+
+            document.getElementById('quizSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('summaryBox').style.display = 'block';
             showResults(total, id);
         }
 
-        async function showResults(total, id) {
-            document.getElementById('quizSection').style.display = 'none';
-            document.getElementById('resultSection').style.display = 'block';
-            document.getElementById('scoreDisplay').innerText = total;
-            
+        function showResults(total, id) {
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.innerText = total;
             const tag = document.getElementById('levelTag');
             const box = document.getElementById('adviceBox');
-            if (total > 30) { tag.innerText = "非常高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-danger"; box.innerHTML = "<strong>臨床影響：</strong>日常生活極大受限。<br><strong>建議：</strong>盡快諮詢醫師。"; }
-            else if (total > 20) { tag.innerText = "高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-warning text-dark"; box.innerHTML = "<strong>臨床影響：</strong>大部分想做的事無法完成。<br><strong>建議：</strong>諮詢醫師調整藥物。"; }
-            else if (total >= 10) { tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; box.innerHTML = "<strong>臨床影響：</strong>對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。"; }
-            else { tag.innerText = "低影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>戒菸、打疫苗、追蹤。"; }
 
-            updateChart(id, 10);
-
-            // 重新檢測按鈕點擊感
-            document.getElementById('btnReload').onclick = function() {
-                this.classList.add('clicked');
-                setTimeout(() => {
-                    location.reload();
-                }, 150);
-            };
-
-            document.getElementById('btnShowAll').onclick = function() {
-                showFullHistory = !showFullHistory;
-                const scrollHint = document.getElementById('scrollHint');
-                const upHint = document.getElementById('upHint');
-                
-                if (showFullHistory) {
-                    this.innerText = "顯示最近 10 次";
-                    document.getElementById('chartTitle').innerText = "完整歷史紀錄";
-                    scrollHint.style.display = 'block';
-                    upHint.style.display = 'none';
-                    updateChart(id, 0);
-                } else {
-                    this.innerText = "查看全部紀錄";
-                    document.getElementById('chartTitle').innerText = "最近 10 次趨勢";
-                    scrollHint.style.display = 'none';
-                    upHint.style.display = 'block';
-                    updateChart(id, 10);
-                }
-            };
+            if (total > 30) {
+                tag.innerText = "非常高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-danger"; scoreDisplay.style.color = "#dc3545";
+                box.innerHTML = "<strong>臨床影響：</strong>日常生活極大受限。<br><strong>建議：</strong>盡快就診諮詢醫師。";
+            }
+            else if (total > 20) {
+                tag.innerText = "高影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-warning text-dark"; scoreDisplay.style.color = "#ffc107";
+                box.innerHTML = "<strong>臨床影響：</strong>大部分想做的事無法完成。<br><strong>建議：</strong>諮詢醫師調整藥物。";
+            }
+            else if (total >= 10) {
+                tag.innerText = "中等影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-info text-dark"; scoreDisplay.style.color = "#0dcaf0";
+                box.innerHTML = "<strong>臨床影響：</strong>對日常生活造成困擾。<br><strong>建議：</strong>戒菸並依照醫囑治療。";
+            }
+            else {
+                tag.innerText = "輕微影響"; tag.className = "badge rounded-pill fs-5 py-3 px-4 mb-4 bg-success"; scoreDisplay.style.color = "#198754";
+                box.innerHTML = "<strong>臨床影響：</strong>生活小問題。<br><strong>建議：</strong>請戒菸、打疫苗、追蹤。";
+            }
+            updateChart(id, 5);
         }
 
         async function updateChart(id, limit) {
-            let historyQuery = limit > 0 ? query(ref(db, `records/${id}`), limitToLast(limit)) : query(ref(db, `records/${id}`));
-
+            let historyQuery = (limit > 0 && !showFullHistory) ? query(ref(db, `records/${id}`), limitToLast(limit)) : query(ref(db, `records/${id}`));
             onValue(historyQuery, (snap) => {
                 const labels = []; const data = [];
                 snap.forEach(child => { labels.push(child.val().date); data.push(child.val().score); });
-
-                const totalPoints = data.length;
                 const chartBox = document.getElementById('chartBox');
-                chartBox.style.width = (totalPoints > 10 && showFullHistory) ? (totalPoints * 60) + "px" : "100%";
-
+                chartBox.style.width = (data.length > 5 && showFullHistory) ? (data.length * 70) + "px" : "100%";
                 if (chartInstance) chartInstance.destroy();
                 const ctx = document.getElementById('historyChart').getContext('2d');
                 chartInstance = new Chart(ctx, {
                     type: 'line',
-                    data: { 
-                        labels: labels, 
-                        datasets: [{ 
-                            data: data, 
-                            borderColor: '#0066cc', 
-                            backgroundColor: 'rgba(0, 102, 204, 0.1)', 
-                            fill: true, 
-                            tension: 0.3, 
-                            pointRadius: 6,
-                            pointBackgroundColor: '#0066cc',
-                            pointBorderColor: '#0066cc',
-                            pointBorderWidth: 1
-                        }] 
-                    },
-                    options: { 
-                        maintainAspectRatio: false,
-                        responsive: true, 
-                        scales: { y: { min: 0, max: 40, ticks: { stepSize: 10 } } }, 
-                        plugins: { legend: { display: false } } 
-                    }
+                    data: { labels: labels, datasets: [{ data: data, borderColor: '#0066cc', backgroundColor: 'rgba(0, 102, 204, 0.1)', fill: true, tension: 0.3, pointRadius: 6, pointBackgroundColor: '#0066cc', pointBorderColor: '#0066cc', pointBorderWidth: 1 }] },
+                    options: { maintainAspectRatio: false, responsive: true, scales: { y: { min: 0, max: 40, ticks: { stepSize: 10 } } }, plugins: { legend: { display: false } } }
                 });
-                
-                if (showFullHistory) {
-                    setTimeout(() => {
-                        document.querySelector('.chart-scroll-wrapper').scrollLeft = chartBox.offsetWidth;
-                    }, 100);
-                }
+                if (showFullHistory) setTimeout(() => { document.querySelector('.chart-scroll-wrapper').scrollLeft = chartBox.offsetWidth; }, 100);
             });
         }
+
+        document.getElementById('btnReload').onclick = function () {
+            this.classList.add('clicked');
+            setTimeout(() => {
+                document.getElementById('resultSection').style.display = 'none';
+                document.getElementById('navSection').style.display = 'block';
+                resetBtnStyles(); // 返回選單後重置所有按鈕樣式
+            }, 150);
+        };
+
+        document.getElementById('btnShowAll').onclick = function () {
+            const id = document.getElementById('patientID').value.trim();
+            showFullHistory = !showFullHistory;
+            const scrollHint = document.getElementById('scrollHint');
+            const upHint = document.getElementById('upHint');
+            if (showFullHistory) {
+                this.innerText = "顯示最近 5 次";
+                document.getElementById('chartTitle').innerText = "全部紀錄";
+                scrollHint.style.display = 'block'; upHint.style.display = 'none';
+                updateChart(id, 0);
+            } else {
+                this.innerText = "查看全部紀錄";
+                document.getElementById('chartTitle').innerText = "最近 5 次趨勢";
+                scrollHint.style.display = 'none'; upHint.style.display = 'block';
+                updateChart(id, 5);
+            }
+        };
     </script>
 </body>
 
